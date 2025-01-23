@@ -20,72 +20,47 @@
     <p>Faucet Link: <a href="https://faucet.mutinynet.com/" target="_blank">https://faucet.mutinynet.com/</a></p>
   </div>
 
+  <script>
+    var wallet;
+    var start;
+  </script>
+
   <script type="module">
     // Import the @fedimint/core-web library
-    import * as Default from 'https://supertestnet.github.io/fedimint-web-sdk-demo/index.js';
+    import * as Default from './index.js';
     const { FedimintWallet } = Default;
 
-    ////////////////////////////////
-    //////////// Setup /////////////
-    ////////////////////////////////
-
-    // Override console methods to display in UI
-    const consoleDiv = document.getElementById('console');
-    ['log', 'error', 'warn', 'info'].forEach(method => {
-      const original = console[method];
-      console[method] = (...args) => {
-        original.apply(console, args);
-        const message = args.map(arg => 
-          typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg
-        ).join(' ');
-        consoleDiv.innerHTML += `${message}\n`;
-        consoleDiv.scrollTop = consoleDiv.scrollHeight;
-      };
-    });
-
-    /////////////////////////////////
-    ///////// Wallet Setup //////////
-    ////////////////////////////////
-
-    let wallet;
-    const TESTNET_INVITE_CODE = 'fed11qgqzc2nhwden5te0vejkg6tdd9h8gepwvejkg6tdd9h8garhduhx6at5d9h8jmn9wshxxmmd9uqqzgxg6s3evnr6m9zdxr6hxkdkukexpcs3mn7mj3g5pc5dfh63l4tj6g9zk4er';
-
-    (async () => {
+    start = async INVITE_CODE => {
       try {
+        // Initialize the wallet
         wallet = new FedimintWallet();
-
-        // HACK: Expose client to global for testing in the browser console
-        globalThis.wallet = wallet
-
-        wallet.setLogLevel('debug')
+        wallet.setLogLevel('debug');
 
         // Tries to open the wallet. If it's not open (new user), it joins the federation
         const isOpen = await wallet.open()
         if (!isOpen) {
-          const joinRes = await wallet.joinFederation(TESTNET_INVITE_CODE)
+          const joinRes = await wallet.joinFederation(INVITE_CODE)
         }
         
-
-      /////////////////////////////////
-      ////////// UI Actions //////////
-      ////////////////////////////////
-
         // Set up event listeners for buttons
         document.getElementById('getBalance').addEventListener('click', async () => {
           const balance = await wallet.balance.getBalance();
           console.log('Balance Response:', balance);
         });
-
         document.getElementById('createInvoice').addEventListener('click', async () => {
           const createInvoice = await wallet.lightning.createInvoice(1000, "Test Invoice");
           console.log('Invoice Response:', createInvoice);
         });
-
       } catch (e) {
         console.error(e);
       }
-    })()
-
+    }
+  </script>
+  <script>
+    setTimeout( () => {
+      var invite_code = 'fed11qvqpw9thwden5te0v9sjuctnvcczummjvuhhwue0qqqpj9mhwden5te0vekkwvfwv3cxcetz9e5kutmhwvhszqfqax36q0annypfxsxqarfecykxk7tk3ynwq2yxphr8qx46hr9cvn0qmctpcm';
+      start( invite_code );
+    }, 1000 );
   </script>
 </body>
 </html>
